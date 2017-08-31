@@ -42,7 +42,9 @@ TriggerEvent("WebSocketServer:addListener", "my:listener");
 
 ### Send a message to connected WebSocket clients
 
-TODO
+```lua
+TriggerEvent("WebSocketServer:broadcast", "This message will be broadcasted to all connected webSocket clients.");
+```
 
 ## Built With
 

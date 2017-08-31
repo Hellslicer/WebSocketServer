@@ -16,14 +16,14 @@ namespace WebSocketServer
 
 		private string authorization;
 		private List<string> events;
+		private List<WebSocket> webSockets;
 
 		public WebSocketServer()
 		{
 			logLevel = Function.Call<string>(Hash.GET_CONVAR, "websocket_debug", "false") == "true" ? LogLevels.Debug : LogLevels.Info;
-
 			authorization = Function.Call<string>(Hash.GET_CONVAR, "websocket_authorization", "");
-			events = new List<string>();
 
+			events = new List<string>();
 			EventHandlers["WebSocketServer:addListener"] += new Action<dynamic>((dynamic eventName) =>
 			{
 				lock (events)
@@ -31,6 +31,25 @@ namespace WebSocketServer
 					if (!events.Contains((string) eventName))
 					{
 						events.Add((string) eventName);
+					}
+				}
+			});
+
+			webSockets = new List<WebSocket>();
+			EventHandlers["WebSocketServer:broadcast"] += new Action<dynamic>((dynamic message) =>
+			{
+				lock (webSockets)
+				{
+					foreach (var webSocket in webSockets)
+					{
+						if (webSocket.IsConnected)
+						{
+							webSocket.WriteStringAsync((string) message, CancellationToken.None);
+						}
+						else
+						{
+							webSockets.Remove(webSocket);
+						}
 					}
 				}
 			});
@@ -55,8 +74,22 @@ namespace WebSocketServer
 					}
 				}
 			});
-			server.OnConnect += (ws)=> Log("Connection from " + ws.RemoteEndpoint.ToString(), LogLevels.Debug);
-			server.OnDisconnect += (ws) => Log("Disconnection from " + ws.RemoteEndpoint.ToString(), LogLevels.Debug);
+			server.OnConnect += (ws) =>
+			{
+				Log ("Connection from " + ws.RemoteEndpoint.ToString (), LogLevels.Debug);
+				lock (webSockets)
+				{
+					webSockets.Add(ws);
+				}
+			};
+			server.OnDisconnect += (ws) =>
+			{
+				Log ("Disconnection from " + ws.RemoteEndpoint.ToString (), LogLevels.Debug);
+				lock (webSockets)
+				{
+					webSockets.Remove(ws);
+				}
+			};
 			server.OnError += (ws, ex) => Log("Error: " + ex.Message, LogLevels.Debug);
 			server.OnMessage += (ws, msg) =>
 			{
