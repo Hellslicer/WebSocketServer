@@ -31,13 +31,10 @@ Convars available:
 ### Add a listener to receive messages
 
 ```lua
--- Create a listener with a string parameter
-AddEventHandler("my:listener", function(message)
+-- Add a new listener with a string parameter
+AddEventHandler("WebSocketServer:onMessage", function(message)
     print("Received message: " .. message)
 end)
-
--- Add your listener to WebSockerServer
-TriggerEvent("WebSocketServer:addListener", "my:listener");
 ```
 
 ### Send a message to connected WebSocket clients

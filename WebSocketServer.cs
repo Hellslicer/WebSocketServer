@@ -14,25 +14,12 @@ namespace WebSocketServer
 		private LogLevels logLevel;
 
 		private string authorization;
-		private List<string> events;
 		private List<WebSocket> webSockets;
 
 		public WebSocketServer()
 		{
 			logLevel = Function.Call<string>(Hash.GET_CONVAR, "websocket_debug", "false") == "true" ? LogLevels.Debug : LogLevels.Info;
 			authorization = Function.Call<string>(Hash.GET_CONVAR, "websocket_authorization", "");
-
-			events = new List<string>();
-			EventHandlers["WebSocketServer:addListener"] += new Action<dynamic>((dynamic eventName) =>
-			{
-				lock (events)
-				{
-					if (!events.Contains((string) eventName))
-					{
-						events.Add((string) eventName);
-					}
-				}
-			});
 
 			webSockets = new List<WebSocket>();
 			EventHandlers["WebSocketServer:broadcast"] += new Action<dynamic>((dynamic message) =>
@@ -94,13 +81,7 @@ namespace WebSocketServer
 			{
 				Log("Received message: " + msg, LogLevels.Debug);
 
-				lock (events)
-				{
-					foreach (var eventName in events)
-					{
-						TriggerEvent(eventName, msg);
-					}
-				}
+				TriggerEvent("WebSocketServer:onMessage", msg);
 			};
 
 			try
