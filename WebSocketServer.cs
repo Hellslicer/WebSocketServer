@@ -3,6 +3,7 @@ using CitizenFX.Core.Native;
 using System;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using vtortola.WebSockets;
 
@@ -15,6 +16,24 @@ namespace WebSocketServer
 
 		private string authorization;
 		private List<WebSocket> webSockets;
+
+		private async Task<bool> CheckHttpHeaders(WebSocketHttpRequest request, WebSocketHttpResponse response)
+		{
+			await Task.Run(() =>
+			{
+				if (authorization.Length > 0)
+				{
+					var authHeader = request.Headers["Authorization"];
+					if (authHeader == null || authHeader != authorization)
+					{
+						response.Status = HttpStatusCode.Unauthorized;
+						Log("Rejected Authorization header: " + authHeader, LogLevels.Debug);
+					}
+				}
+			});
+
+			return true;
+		}
 
 		public WebSocketServer()
 		{
@@ -47,18 +66,7 @@ namespace WebSocketServer
 
 			var server = new WebSocketEventListener (endpoint, new WebSocketListenerOptions () {
 				SubProtocols = new String[]{ "text" },
-				OnHttpNegotiation = (request, response) =>
-				{
-					if (authorization.Length > 0)
-					{
-						var authHeader = request.Headers["Authorization"];
-						if (authHeader == null || authHeader != authorization)
-						{
-							response.Status = HttpStatusCode.Unauthorized;
-							Log("Rejected Authorization header: " + authHeader, LogLevels.Debug);
-						}
-					}
-				}
+				HttpAuthenticationHandler = CheckHttpHeaders
 			});
 			server.OnConnect += (ws) =>
 			{

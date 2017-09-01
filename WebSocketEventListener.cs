@@ -27,18 +27,18 @@ namespace WebSocketServer
 
 		public WebSocketEventListener(IPEndPoint endpoint, WebSocketListenerOptions options)
 		{
+			options.Standards.RegisterRfc6455();
 			_listener = new WebSocketListener(endpoint, options);
-			_listener.Standards.RegisterStandard(new WebSocketFactoryRfc6455(_listener));
 		}
 
 		public void Start()
 		{
-			_listener.Start();
+			_listener.StartAsync().Wait();
 		}
 
 		public void Stop()
 		{
-			_listener.Stop();
+			_listener.StopAsync().Wait();
 		}
 
 		public async Task ListenAsync()

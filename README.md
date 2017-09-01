@@ -8,13 +8,6 @@ This library exposes a simple WebSocket server into FXServer.
 * Text messages
 * Authorization header support
 
-## Prerequisites
-
-* `System.Web.dll`
-* `System.Security.dll`
-* `System.ServiceModel.dll`
-* `System.IdentityModel.dll`
-
 ## Configuration
 
 Convars available:
@@ -45,7 +38,7 @@ TriggerEvent("WebSocketServer:broadcast", "This message will be broadcasted to a
 
 ## Built With
 
-* [vtortola/WebSocketListener](https://github.com/vtortola/WebSocketListener)
+* [deniszykov/WebSocketListener](https://github.com/deniszykov/WebSocketListener)
 
 ## License
 

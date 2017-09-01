@@ -41,17 +41,8 @@
     <Reference Include="Microsoft.CSharp">
       <HintPath>bin\Debug\Microsoft.CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="System.Threading.Tasks.Dataflow, Version=4.5.24.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>packages\Microsoft.Tpl.Dataflow.4.5.24\lib\portable-net45+win8+wpa81\System.Threading.Tasks.Dataflow.dll</HintPath>
-    </Reference>
-    <Reference Include="vtortola.WebSockets, Version=2.2.3.0, Culture=neutral, PublicKeyToken=7f78616efb4a208d, processorArchitecture=MSIL">
-      <HintPath>packages\vtortola.WebSocketListener.2.2.3.0\lib\net45\vtortola.WebSockets.dll</HintPath>
-    </Reference>
-    <Reference Include="vtortola.WebSockets.Deflate, Version=2.2.3.0, Culture=neutral, PublicKeyToken=7f78616efb4a208d, processorArchitecture=MSIL">
-      <HintPath>packages\vtortola.WebSocketListener.2.2.3.0\lib\net45\vtortola.WebSockets.Deflate.dll</HintPath>
-    </Reference>
-    <Reference Include="vtortola.WebSockets.Rfc6455, Version=2.2.3.0, Culture=neutral, PublicKeyToken=7f78616efb4a208d, processorArchitecture=MSIL">
-      <HintPath>packages\vtortola.WebSocketListener.2.2.3.0\lib\net45\vtortola.WebSockets.Rfc6455.dll</HintPath>
+    <Reference Include="deniszykov.WebSocketListener">
+      <HintPath>packages\deniszykov.WebSocketListener.4.0.0\lib\net45\deniszykov.WebSocketListener.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
