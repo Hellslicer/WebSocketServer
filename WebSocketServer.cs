@@ -40,25 +40,6 @@ namespace WebSocketServer
 			logLevel = Function.Call<string>(Hash.GET_CONVAR, "websocket_debug", "false") == "true" ? LogLevels.Debug : LogLevels.Info;
 			authorization = Function.Call<string>(Hash.GET_CONVAR, "websocket_authorization", "");
 
-			webSockets = new List<WebSocket>();
-			EventHandlers["WebSocketServer:broadcast"] += new Action<dynamic>((dynamic message) =>
-			{
-				lock (webSockets)
-				{
-					foreach (var webSocket in webSockets)
-					{
-						if (webSocket.IsConnected)
-						{
-							webSocket.WriteStringAsync((string) message, CancellationToken.None);
-						}
-						else
-						{
-							webSockets.Remove(webSocket);
-						}
-					}
-				}
-			});
-
 			IPAddress listeningHost = IPAddress.Loopback;
 			IPAddress.TryParse(Function.Call<string>(Hash.GET_CONVAR, "websocket_host", "127.0.0.1"), out listeningHost);
 			int listeningPort = Function.Call<int>(Hash.GET_CONVAR_INT, "websocket_port", 80);
@@ -92,17 +73,51 @@ namespace WebSocketServer
 				TriggerEvent("WebSocketServer:onMessage", msg);
 			};
 
-			try
+			EventHandlers["onResourceStart"] += new Action<dynamic>((dynamic resourceName) =>
 			{
-				server.Start();
-				Tick += server.ListenAsync;
+				if ((string) resourceName == "WebSocketServer")
+				{
+					try
+					{
+						server.Start();
+						Tick += server.ListenAsync;
 
-				Log("Started at " + endpoint.ToString());
-			}
-			catch (Exception e)
+						Log("Started at " + endpoint.ToString());
+					}
+					catch (Exception e)
+					{
+						Log("Can't start server at " + endpoint.ToString() + ": " + e.Message);
+					}
+				}
+			});
+
+			EventHandlers["onResourceStop"] += new Action<dynamic>((dynamic resourceName) =>
 			{
-				Log("Can't start server at " + endpoint.ToString() + ": " + e.Message);
-			}
+				if ((string) resourceName == "WebSocketServer")
+				{
+					server.Stop();
+					server.Dispose();
+				}
+			});
+
+			webSockets = new List<WebSocket>();
+			EventHandlers["WebSocketServer:broadcast"] += new Action<dynamic>((dynamic message) =>
+			{
+				lock (webSockets)
+				{
+					foreach (var webSocket in webSockets)
+					{
+						if (webSocket.IsConnected)
+						{
+							webSocket.WriteStringAsync((string) message, CancellationToken.None);
+						}
+						else
+						{
+							webSockets.Remove(webSocket);
+						}
+					}
+				}
+			});
 		}
 
 		private void Log(string message, LogLevels level = LogLevels.Info)
