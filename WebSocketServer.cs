@@ -109,7 +109,17 @@ namespace WebSocketServer
 					{
 						if (webSocket.IsConnected)
 						{
-							webSocket.WriteStringAsync((string) message, CancellationToken.None);
+							Task.Run(async () =>
+							{
+								try
+								{
+									await webSocket.WriteStringAsync((string) message, CancellationToken.None);
+								}
+								catch (Exception e)
+								{
+									Log("An error occurred while sending a message to " + webSocket.RemoteEndpoint.ToString() + ": " + e.Message, LogLevels.Debug);
+								}
+							});
 						}
 						else
 						{
