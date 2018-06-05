@@ -143,16 +143,20 @@ namespace WebSocketServer
 					{
 						if (webSocket.IsConnected)
 						{
-							if (webSocket.RemoteEndpoint.ToString () == client) {
-								try
+							if (webSocket.RemoteEndpoint.ToString () == client)
+							{
+								Task.Run(async () =>
 								{
-									await webSocket.WriteStringAsync((string) message, CancellationToken.None);
-								}
-								catch (Exception e)
-								{
-									Log("An error occurred while sending a message to " + webSocket.RemoteEndpoint.ToString() + ": " + e.Message, LogLevels.Debug);
-								}
-							}
+									try
+									{
+										await webSocket.WriteStringAsync((string) message, CancellationToken.None);
+									}
+									catch (Exception e)
+									{
+										Log("An error occurred while sending a message to " + webSocket.RemoteEndpoint.ToString() + ": " + e.Message, LogLevels.Debug);
+									}
+								});
+                            }
 						}
 						else
 						{
