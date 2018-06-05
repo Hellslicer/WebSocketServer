@@ -52,6 +52,9 @@ namespace WebSocketServer
 			server.OnConnect += (ws) =>
 			{
 				Log ("Connection from " + ws.RemoteEndpoint.ToString (), LogLevels.Debug);
+
+				TriggerEvent("WebSocketServer:onConnect", ws.RemoteEndpoint.ToString ());
+
 				lock (webSockets)
 				{
 					webSockets.Add(ws);
@@ -60,6 +63,9 @@ namespace WebSocketServer
 			server.OnDisconnect += (ws) =>
 			{
 				Log ("Disconnection from " + ws.RemoteEndpoint.ToString (), LogLevels.Debug);
+
+				TriggerEvent("WebSocketServer:onDisconnect", ws.RemoteEndpoint.ToString ());
+
 				lock (webSockets)
 				{
 					webSockets.Remove(ws);
@@ -70,7 +76,7 @@ namespace WebSocketServer
 			{
 				Log("Received message: " + msg, LogLevels.Debug);
 
-				TriggerEvent("WebSocketServer:onMessage", msg);
+				TriggerEvent("WebSocketServer:onMessage", msg, ws.RemoteEndpoint.ToString ());
 			};
 
 			EventHandlers["onResourceStart"] += new Action<dynamic>((dynamic resourceName) =>
@@ -118,6 +124,36 @@ namespace WebSocketServer
 					}
 				}
 			});
+
+			EventHandlers["WebSocketServer:send"] += new Action<dynamic, dynamic>((dynamic message, dynamic client) =>
+			{
+				lock (webSockets)
+				{
+					foreach (var webSocket in webSockets)
+					{
+						if (webSocket.IsConnected)
+						{
+							if (webSocket.RemoteEndpoint.ToString () == client) {
+								try
+								{
+									await webSocket.WriteStringAsync((string) message, CancellationToken.None);
+								}
+								catch (Exception e)
+								{
+									Log("An error occurred while sending a message to " + webSocket.RemoteEndpoint.ToString() + ": " + e.Message, LogLevels.Debug);
+								}
+							}
+						}
+						else
+						{
+							webSockets.Remove(webSocket);
+						}
+					}
+				}
+			});
+
+
+
 		}
 
 		private void Log(string message, LogLevels level = LogLevels.Info)
