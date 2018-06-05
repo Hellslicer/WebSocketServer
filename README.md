@@ -24,9 +24,24 @@ Convars available:
 ### Add a listener to receive messages
 
 ```lua
--- Add a new listener with a string parameter
-AddEventHandler("WebSocketServer:onMessage", function(message)
-    print("Received message: " .. message)
+AddEventHandler("WebSocketServer:onMessage", function(message, endpoint)
+    print("Received message from " .. endpoint .. ": " .. message)
+end)
+```
+
+### Add a listener to get new connected remote endpoints
+
+```lua
+AddEventHandler("WebSocketServer:onConnect", function(endpoint)
+    print("New WS remote endpoint: " .. endpoint)
+end)
+```
+
+### Add a listener to get disconnected remote endpoints
+
+```lua
+AddEventHandler("WebSocketServer:onDisconnect", function(endpoint)
+    print("WS remote endpoint " .. endpoint .. " has been disconnected")
 end)
 ```
 
@@ -34,6 +49,12 @@ end)
 
 ```lua
 TriggerEvent("WebSocketServer:broadcast", "This message will be broadcasted to all connected webSocket clients.");
+```
+
+### Send a message to a specific WebSocket client
+
+```lua
+TriggerEvent("WebSocketServer:send", "This message will be sent to a specific webSocket client.", someValidAndConnectedRemoteEndpoint);
 ```
 
 ## Built With

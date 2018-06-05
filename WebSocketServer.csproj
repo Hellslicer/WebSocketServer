@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -22,7 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Externalconsole>true</Externalconsole>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>full</DebugType>
@@ -37,12 +37,12 @@
     <Reference Include="CitizenFX.Core">
       <HintPath>..\..\..\..\FX\alpine\opt\cfx-server\citizen\clr2\lib\mono\4.5\CitizenFX.Core.dll</HintPath>
     </Reference>
+    <Reference Include="deniszykov.WebSocketListener, Version=4.2.2.0, Culture=neutral, PublicKeyToken=7f78616efb4a208d, processorArchitecture=MSIL">
+      <HintPath>packages\deniszykov.WebSocketListener.4.2.2\lib\net45\deniszykov.WebSocketListener.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp">
       <HintPath>bin\Debug\Microsoft.CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="deniszykov.WebSocketListener">
-      <HintPath>packages\deniszykov.WebSocketListener.4.0.0\lib\net45\deniszykov.WebSocketListener.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
