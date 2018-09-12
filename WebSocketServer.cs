@@ -177,7 +177,7 @@ namespace WebSocketServer
 				return;
 			}
 
-			Console.WriteLine("[WebSocket Server] " + message);
+			Debug.WriteLine("[WebSocket Server] " + message);
 		}
 	}
 }
