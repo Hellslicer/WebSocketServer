@@ -166,8 +166,19 @@ namespace WebSocketServer
 				}
 			});
 
-
-
+			EventHandlers["WebSocketServer:removeEndpoint"] += new Action<dynamic>((dynamic client) =>
+			{
+				lock (webSockets)
+				{
+					foreach (var webSocket in webSockets)
+					{
+						if (webSocket.IsConnected && webSocket.RemoteEndpoint.ToString() == client)
+						{
+							webSockets.Remove(webSocket);
+						}
+					}
+				}
+			});
 		}
 
 		private void Log(string message, LogLevels level = LogLevels.Info)
