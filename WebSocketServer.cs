@@ -15,6 +15,7 @@ namespace WebSocketServer
 		private LogLevels logLevel;
 
 		private string authorization;
+		private List<CallbackDelegate> authorizationHandlers;
 		private List<WebSocket> webSockets;
 
 		private async Task<bool> CheckHttpHeaders(WebSocketHttpRequest request, WebSocketHttpResponse response)
@@ -30,6 +31,22 @@ namespace WebSocketServer
 						Log("Rejected Authorization header: " + authHeader, LogLevels.Debug);
 					}
 				}
+
+				for (int i = authorizationHandlers.Count - 1; i >= 0; i--)
+				{
+					try
+					{
+						if (!(bool) authorizationHandlers[i](request.RemoteEndPoint.ToString(), request.Headers.ToString()))
+						{
+							response.Status = HttpStatusCode.Unauthorized;
+						}
+					}
+					catch (Exception e)
+					{
+						Log("An error occurred while calling an authentication handler: " + e.Message, LogLevels.Debug);
+						authorizationHandlers.RemoveAt(i);
+					}
+				}
 			});
 
 			return true;
@@ -39,6 +56,7 @@ namespace WebSocketServer
 		{
 			logLevel = Function.Call<string>(Hash.GET_CONVAR, "websocket_debug", "false") == "true" ? LogLevels.Debug : LogLevels.Info;
 			authorization = Function.Call<string>(Hash.GET_CONVAR, "websocket_authorization", "");
+			authorizationHandlers = new List<CallbackDelegate>();
 
 			IPAddress listeningHost = IPAddress.Loopback;
 			IPAddress.TryParse(Function.Call<string>(Hash.GET_CONVAR, "websocket_host", "127.0.0.1"), out listeningHost);
@@ -104,6 +122,11 @@ namespace WebSocketServer
 					server.Stop();
 					server.Dispose();
 				}
+			});
+
+			EventHandlers["WebSocketServer:addAuthHandler"] += new Action<dynamic>((dynamic handler) =>
+			{
+				authorizationHandlers.Add(handler);
 			});
 
 			webSockets = new List<WebSocket>();
